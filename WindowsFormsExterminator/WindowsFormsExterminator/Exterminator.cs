@@ -22,8 +22,7 @@ namespace WindowsFormsExterminator
 		/// <param name="mainColor">Основной цвет кузова</param>
 		/// <param name="dopColor">Дополнительный цвет</param>
 		public Exterminator(int maxSpeed, float weight, Color mainColor, Color dopColor, bool
-	   frontSpoiler, bool sideSpoiler, bool backSpoiler) :
-			base(maxSpeed, weight, mainColor)
+	   frontSpoiler, bool sideSpoiler, bool backSpoiler) : base(maxSpeed, weight, mainColor)
 		{
 			DopColor = dopColor;
 
@@ -88,11 +87,8 @@ namespace WindowsFormsExterminator
 		{
 			SolidBrush fillQuad = new SolidBrush(MainColor);
 			g.FillRectangle(fillQuad, _startPosX + 22, _startPosY + 7, 7, 7);
-			//13
 			SolidBrush fillQuadSec = new SolidBrush(MainColor);
 			g.FillRectangle(fillQuad, _startPosX + 22, _startPosY + 37, 7, 7);
-
-			// Pen pen1 = new Pen(Color.Black, 1);
 			SolidBrush fillRect = new SolidBrush(DopColor);
 			g.FillRectangle(fillRect, _startPosX + 35, _startPosY + 7, 35, 3);
 			SolidBrush fillRect1 = new SolidBrush(DopColor);
@@ -100,8 +96,11 @@ namespace WindowsFormsExterminator
 			SolidBrush fillEll = new SolidBrush(Color.Red);
 			g.FillEllipse(fillEll, _startPosX + 70, _startPosY + 4, 18, 8);
 			g.FillEllipse(fillEll, _startPosX + 70, _startPosY + 38, 18, 8);
-
 			base.DrawExterminator(g);
+		}
+		public void SetDopColor(Color color)
+		{
+			DopColor = color;
 		}
 	}
 }

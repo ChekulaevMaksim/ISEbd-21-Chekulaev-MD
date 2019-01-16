@@ -28,6 +28,6 @@ namespace WindowsFormsExterminator
 		/// </summary>
 		/// <param name="g"></param>
 		void DrawExterminator(Graphics g);
-
+		void SetMainColor(Color color);
 	}
 }

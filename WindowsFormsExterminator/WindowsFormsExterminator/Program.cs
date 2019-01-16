@@ -6,6 +6,8 @@ using System.Windows.Forms;
 
 namespace WindowsFormsExterminator
 {
+	public delegate void planeDelegate(IPlane exterminator);
+
 	static class Program
 	{
 		/// <summary>
@@ -16,7 +18,7 @@ namespace WindowsFormsExterminator
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new FormExterm());
+			Application.Run(new FormParking());
 		}
 	}
 }
