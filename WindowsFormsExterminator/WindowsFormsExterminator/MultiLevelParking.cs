@@ -154,6 +154,7 @@ namespace WindowsFormsExterminator
 				throw new Exception("Неверный формат файла");
 			}
 			int counter = -1;
+			int counterPlane = 0;
 			IPlane exterminator = null;
 			for (int i = 1; i < strs.Length; ++i)
 			{
@@ -162,6 +163,7 @@ namespace WindowsFormsExterminator
 				{
 					//начинаем новый уровень
 					counter++;
+					counterPlane = 0;
 					parkingStages.Add(new Parking<IPlane>(countPlaces, pictureWidth, pictureHeight));
 					continue;
 				}
@@ -177,9 +179,16 @@ namespace WindowsFormsExterminator
 				{
 					exterminator = new Exterminator(strs[i].Split(':')[2]);
 				}
-				parkingStages[counter][Convert.ToInt32(strs[i].Split(':')[0])] = exterminator;
+				parkingStages[counter][counterPlane++] = exterminator;
 			}
 			return true;
+		}
+		/// <summary>
+		/// Сортировка уровней
+		/// </summary>
+		public void Sort()
+		{
+			parkingStages.Sort();
 		}
 	}
 

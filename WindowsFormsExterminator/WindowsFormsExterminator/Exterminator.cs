@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace WindowsFormsExterminator
 {
-	public class Exterminator : Simpleplane
+	public class Exterminator : Simpleplane, IComparable<Exterminator>, IEquatable<Exterminator>
 	{
 		/// <summary>
 		/// Дополнительный цвет
@@ -116,6 +116,71 @@ namespace WindowsFormsExterminator
 		public override string ToString()
 		{
 			return base.ToString() + ";" + DopColor.Name;
+		}
+		/// <summary>
+		/// Метод интерфейса IComparable для класса SportCar
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		public int CompareTo(Exterminator other)
+		{
+			var res = (this is Simpleplane).CompareTo(other is Simpleplane);
+			if (res != 0)
+			{
+				return res;
+			}
+			if (DopColor != other.DopColor)
+			{
+				DopColor.Name.CompareTo(other.DopColor.Name);
+			}
+			return 0;
+		}
+		/// <summary>
+		/// Метод интерфейса IEquatable для класса SportCar
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		public bool Equals(Exterminator other)
+		{
+			var res = (this as Simpleplane).Equals(other as Simpleplane);
+			if (!res)
+			{
+				return res;
+			}
+			if (DopColor != other.DopColor)
+			{
+				return false;
+			}
+			return true;
+		}
+		/// <summary>
+		/// Перегрузка метода от object
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
+		public override bool Equals(Object obj)
+		{
+			if (obj == null)
+			{
+				return false;
+			}
+			Exterminator exterminatorObj = obj as Exterminator;
+			if (exterminatorObj == null)
+			{
+				return false;
+			}
+			else
+			{
+				return Equals(exterminatorObj);
+			}
+		}
+		/// <summary>
+		/// Перегрузка метода от object
+		/// </summary>
+		/// <returns></returns>
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
 		}
 	}
 }
