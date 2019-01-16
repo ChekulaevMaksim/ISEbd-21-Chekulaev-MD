@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace WindowsFormsExterminator
 {
@@ -11,7 +12,7 @@ namespace WindowsFormsExterminator
 	/// Параметризованны класс для хранения набора объектов от интерфейса ITransport
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class Parking<T> where T : class, IPlane
+	public class Parking<T> : IEnumerator<T>, IEnumerable<T>, IComparable<Parking<T>> where T : class, IPlane
 	{
 		/// <summary>
 		/// Массив объектов, которые храним
@@ -37,6 +38,10 @@ namespace WindowsFormsExterminator
 		/// Размер парковочного места (высота)
 		/// </summary>
 		private int _placeSizeHeight = 80;
+		/// <summary>
+		/// Текущий элемент для вывода через IEnumerator (будет обращаться по своему индексу к ключу словаря, по которму будет возвращаться запись)
+		/// </summary>
+		private int _currentIndex;
 		/// <summary>
 		/// Конструктор
 		/// </summary>
@@ -72,6 +77,21 @@ namespace WindowsFormsExterminator
 					 i % 5 * p._placeSizeHeight + 15, p.PictureWidth,
 					p.PictureHeight);
 					return i;
+				}
+				else if (exterminator.GetType() == p._places[i].GetType())
+				{
+					if (exterminator is Exterminator)
+					{
+						if ((exterminator as Exterminator).Equals(p._places[i]))
+						{
+							throw new ParkingAlreadyHaveException();
+						}
+					}
+					else if ((exterminator as Simpleplane).Equals(p._places[i]))
+					{
+						throw new ParkingAlreadyHaveException();
+					}
+
 				}
 			}
 			return -1;
@@ -109,10 +129,9 @@ namespace WindowsFormsExterminator
 		public void Draw(Graphics g)
 		{
 			DrawMarking(g);
-			var keys = _places.Keys.ToList();
-			for (int i = 0; i < keys.Count; i++)
+			foreach (var exterminator in _places)
 			{
-				_places[keys[i]].DrawExterminator(g);
+				exterminator.Value.DrawExterminator(g);
 			}
 		}
 		/// <summary>
@@ -159,6 +178,108 @@ namespace WindowsFormsExterminator
 				}
 				else throw new ParkingOccupiedPlaceException(ind);
 			}
+		}
+		public T Current
+		{
+			get
+			{
+				return _places[_places.Keys.ToList()[_currentIndex]];
+			}
+		}
+		/// <summary>
+		/// Метод интерфейса IEnumerator для получения текущего элемента
+		/// </summary>
+		object IEnumerator.Current
+		{
+			get
+			{
+				return Current;
+			}
+		}
+		/// <summary>
+		/// Метод интерфейса IEnumerator, вызываемый при удалении объекта
+		/// </summary>
+		public void Dispose()
+		{
+			_places.Clear();
+		}
+		/// <summary>
+		/// Метод интерфейса IEnumerator для перехода к следующему элементу или началу коллекции
+		/// </summary>
+		/// <returns></returns>
+		public bool MoveNext()
+		{
+			if (_currentIndex + 1 >= _places.Count)
+			{
+				Reset();
+				return false;
+			}
+			_currentIndex++;
+			return true;
+		}
+		/// <summary>
+		/// Метод интерфейса IEnumerator для сброса и возврата к началу коллекции
+		/// </summary>
+		public void Reset()
+		{
+			_currentIndex = -1;
+		}
+		/// <summary>
+		/// Метод интерфейса IEnumerable
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerator<T> GetEnumerator()
+		{
+			return this;
+		}
+		/// <summary>
+		/// Метод интерфейса IEnumerable
+		/// </summary>
+		/// <returns></returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+		/// <summary>
+		/// Метод интерфейса IComparable
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		public int CompareTo(Parking<T> other)
+		{
+			if (_places.Count > other._places.Count)
+			{
+				return -1;
+			}
+			else if (_places.Count < other._places.Count)
+			{
+				return 1;
+			}
+			else if (_places.Count > 0)
+			{
+				var thisKeys = _places.Keys.ToList();
+				var otherKeys = other._places.Keys.ToList();
+				for (int i = 0; i < _places.Count; ++i)
+				{
+					if (_places[thisKeys[i]] is Simpleplane && other._places[thisKeys[i]] is Exterminator)
+					{
+						return 1;
+					}
+					if (_places[thisKeys[i]] is Exterminator && other._places[thisKeys[i]] is Simpleplane)
+					{
+						return -1;
+					}
+					if (_places[thisKeys[i]] is Simpleplane && other._places[thisKeys[i]] is Simpleplane)
+					{
+						return (_places[thisKeys[i]] is Simpleplane).CompareTo(other._places[thisKeys[i]] is Simpleplane);
+					}
+					if (_places[thisKeys[i]] is Exterminator && other._places[thisKeys[i]] is Exterminator)
+					{
+						return (_places[thisKeys[i]] is Exterminator).CompareTo(other._places[thisKeys[i]] is Exterminator);
+					}
+				}
+			}
+			return 0;
 		}
 	}
 
