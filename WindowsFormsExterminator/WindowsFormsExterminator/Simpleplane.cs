@@ -30,6 +30,16 @@ namespace WindowsFormsExterminator
 			Weight = weight;
 			MainColor = mainColor;
 		}
+		public Simpleplane(string info)
+		{
+			string[] strs = info.Split(';');
+			if (strs.Length == 3)
+			{
+				MaxSpeed = Convert.ToInt32(strs[0]);
+				Weight = Convert.ToInt32(strs[1]);
+				MainColor = Color.FromName(strs[2]);
+			}
+		}
 		public override void MoveTransport(Direction direction)
 		{
 			float step = MaxSpeed * 100 / Weight;
@@ -78,6 +88,10 @@ namespace WindowsFormsExterminator
 			g.DrawLine(pen, _startPosX + 17, _startPosY + 42, _startPosX + 7, _startPosY + 25);
 			Brush br = new SolidBrush(MainColor);
 			g.FillEllipse(br, _startPosX + 15, _startPosY + 18, 15, 15);
+		}
+		public override string ToString()
+		{
+			return MaxSpeed + ";" + Weight + ";" + MainColor.Name;
 		}
 
 	}

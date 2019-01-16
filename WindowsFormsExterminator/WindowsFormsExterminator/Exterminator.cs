@@ -27,6 +27,17 @@ namespace WindowsFormsExterminator
 			DopColor = dopColor;
 
 		}
+		public Exterminator(string info) : base(info)
+		{
+			string[] strs = info.Split(';');
+			if (strs.Length == 4)
+			{
+				MaxSpeed = Convert.ToInt32(strs[0]);
+				Weight = Convert.ToInt32(strs[1]);
+				MainColor = Color.FromName(strs[2]);
+				DopColor = Color.FromName(strs[3]);
+			}
+		}
 		/// <summary>
 		/// Установка позиции автомобиля
 		/// </summary>
@@ -101,6 +112,10 @@ namespace WindowsFormsExterminator
 		public void SetDopColor(Color color)
 		{
 			DopColor = color;
+		}
+		public override string ToString()
+		{
+			return base.ToString() + ";" + DopColor.Name;
 		}
 	}
 }
