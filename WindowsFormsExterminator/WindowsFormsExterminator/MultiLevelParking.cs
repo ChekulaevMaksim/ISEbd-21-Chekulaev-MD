@@ -121,7 +121,7 @@ namespace WindowsFormsExterminator
 		{
 			if (!File.Exists(filename))
 			{
-				return false;
+				throw new FileNotFoundException();
 			}
 			string bufferTextFromFile = "";
 			using (FileStream fs = new FileStream(filename, FileMode.Open))
@@ -151,7 +151,7 @@ namespace WindowsFormsExterminator
 			else
 			{
 				//если нет такой записи, то это не те данные
-				return false;
+				throw new Exception("Неверный формат файла");
 			}
 			int counter = -1;
 			IPlane exterminator = null;

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NLog;
 
 namespace WindowsFormsExterminator
 {
@@ -21,10 +22,12 @@ namespace WindowsFormsExterminator
 		/// Количество уровней-парковок
 		/// </summary>
 		private const int countLevel = 5;
+		private Logger logger;
 
 		public FormParking()
 		{
 			InitializeComponent();
+			logger = LogManager.GetCurrentClassLogger();
 			parking = new MultiLevelParking(countLevel, pictureBoxParking.Width, pictureBoxParking.Height);
 			//заполнение listBox
 			for (int i = 0; i < countLevel; i++)
@@ -51,21 +54,33 @@ namespace WindowsFormsExterminator
 			{
 				if (maskedTextBoxParking.Text != "")
 				{
-					var exterminator = parking[listBoxLevels.SelectedIndex] - Convert.ToInt32(maskedTextBoxParking.Text);
-					if (exterminator != null)
+					
+					try
 					{
+
+						var exterminator = parking[listBoxLevels.SelectedIndex] - Convert.ToInt32(maskedTextBoxParking.Text);
+					
 						Bitmap bmp = new Bitmap(pictureBoxLittleParking.Width, pictureBoxLittleParking.Height);
 						Graphics gr = Graphics.FromImage(bmp);
-						exterminator.SetPosition(5, 5, pictureBoxLittleParking.Width, pictureBoxLittleParking.Height);
+						exterminator.SetPosition(5, 5, pictureBoxLittleParking.Width,pictureBoxLittleParking.Height);
 						exterminator.DrawExterminator(gr);
 						pictureBoxLittleParking.Image = bmp;
+
+						logger.Info("Изъят самолет " + exterminator.ToString() + " с места " + maskedTextBoxParking.Text);
+
+						Draw();
 					}
-					else
+					catch (ParkingNotFoundException ex)
 					{
-						Bitmap bmp = new Bitmap(pictureBoxLittleParking.Width, pictureBoxLittleParking.Height);
+						MessageBox.Show(ex.Message, "Не найдено", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						Bitmap bmp = new Bitmap(pictureBoxLittleParking.Width,pictureBoxLittleParking.Height);
 						pictureBoxLittleParking.Image = bmp;
 					}
-					Draw();
+					catch (Exception ex)
+					{
+					MessageBox.Show(ex.Message, "Неизвестная ошибка",
+					   MessageBoxButtons.OK, MessageBoxIcon.Error);
+					}
 				}
 			}
 
@@ -85,14 +100,22 @@ namespace WindowsFormsExterminator
 		{
 			if (exterminator != null && listBoxLevels.SelectedIndex > -1)
 			{
-				int place = parking[listBoxLevels.SelectedIndex] + exterminator;
-				if (place > -1)
+				try
 				{
+
+					int place = parking[listBoxLevels.SelectedIndex] + exterminator;
+					logger.Info("Добавлен самолет " + exterminator.ToString() + " на место " + place);
 					Draw();
 				}
-				else
+				catch (ParkingOverflowException ex)
 				{
-					MessageBox.Show("Самолет не удалось поставить");
+					MessageBox.Show(ex.Message, "Переполнение", MessageBoxButtons.OK,
+				   MessageBoxIcon.Error);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Неизвестная ошибка",
+				   MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 		}
@@ -100,15 +123,17 @@ namespace WindowsFormsExterminator
 		{
 			if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
-				if (parking.SaveData(saveFileDialog.FileName))
+				try
 				{
+					parking.SaveData(saveFileDialog.FileName);
 					MessageBox.Show("Сохранение прошло успешно", "Результат",
-				   MessageBoxButtons.OK, MessageBoxIcon.Information);
+					MessageBoxButtons.OK, MessageBoxIcon.Information);
+					logger.Info("Сохранено в файл " + saveFileDialog.FileName);
 				}
-				else
+				catch (Exception ex)
 				{
-					MessageBox.Show("Не сохранилось", "Результат", MessageBoxButtons.OK,
-				   MessageBoxIcon.Error);
+					MessageBox.Show(ex.Message, "Неизвестная ошибка при сохранении",
+				   MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 		}
@@ -117,15 +142,22 @@ namespace WindowsFormsExterminator
 		{
 			if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
-				if (parking.LoadData(openFileDialog.FileName))
+				try
 				{
+					parking.LoadData(openFileDialog.FileName);
 					MessageBox.Show("Загрузили", "Результат", MessageBoxButtons.OK,
-				   MessageBoxIcon.Information);
+					MessageBoxIcon.Information);
+					logger.Info("Загружено из файла " + openFileDialog.FileName);
 				}
-				else
+				catch (ParkingOccupiedPlaceException ex)
 				{
-					MessageBox.Show("Не загрузили", "Результат", MessageBoxButtons.OK,
+					MessageBox.Show(ex.Message, "Занятое место", MessageBoxButtons.OK,
 				   MessageBoxIcon.Error);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Неизвестная ошибка при сохранении",
+				   MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 				Draw();
 			}
