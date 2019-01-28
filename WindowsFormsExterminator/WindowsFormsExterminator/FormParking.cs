@@ -12,100 +12,71 @@ namespace WindowsFormsExterminator
 {
 	public partial class FormParking : Form
 	{
-		/// <summary>
-		/// Объект от класса многоуровневой парковки
-		/// </summary>
-			MultiLevelParking parking;
-		/// <summary>
-		/// Количество уровней-парковок
-		/// </summary>
-			private const int countLevel = 5;
+		Parking<IPlane> parking;
 
-			public FormParking()
+		public FormParking()
+		{
+			InitializeComponent();
+			parking = new Parking<IPlane>(20, pictureBoxParking.Width, pictureBoxParking.Height);
+			Draw();
+		}
+		private void Draw()
+		{
+			Bitmap bmp = new Bitmap(pictureBoxParking.Width, pictureBoxParking.Height);
+			Graphics gr = Graphics.FromImage(bmp);
+			parking.Draw(gr);
+			pictureBoxParking.Image = bmp;
+		}
+
+		private void buttonParkingSimpleplane_Click(object sender, EventArgs e)//простой самолет
+		{
+			ColorDialog dialog = new ColorDialog();
+			if (dialog.ShowDialog() == DialogResult.OK)
 			{
-				InitializeComponent();
-				parking = new MultiLevelParking(countLevel, pictureBoxParking.Width, pictureBoxParking.Height);
-				//заполнение listBox
-				for (int i = 0; i < countLevel; i++)
-				{
-					listBoxLevels.Items.Add("Уровень " + (i + 1));
-				}
-				listBoxLevels.SelectedIndex = 0;
+				var exterminator = new Simpleplane(100, 1000, dialog.Color);
+				int place = parking + exterminator;
+				Draw();
 			}
-			private void Draw()
+		}
+
+		private void buttonParkingExterminator_Click(object sender, EventArgs e)//сложный самолет
+		{
+			ColorDialog dialog = new ColorDialog();
+			if (dialog.ShowDialog() == DialogResult.OK)
 			{
-				if (listBoxLevels.SelectedIndex > -1)
+				ColorDialog dialogDop = new ColorDialog();
+				if (dialogDop.ShowDialog() == DialogResult.OK)
 				{
-					//если выбран один из пуктов в listBox (при старте программы ни один пунктне будет выбран и может возникнуть ошибка, если мы попытаемся обратиться к элементу listBox)
-					Bitmap bmp = new Bitmap(pictureBoxParking.Width, pictureBoxParking.Height);
+					var exterminator = new Exterminator(100, 1000, dialog.Color, dialogDop.Color,
+				   true, true, true);
+					int place = parking + exterminator;
+					Draw();
+				}
+			}
+		}
+		private void buttonTakePlane_Click(object sender, EventArgs e)//забрать
+		{
+			if (maskedTextBoxParking.Text != "")
+			{
+				var exterminator = parking - Convert.ToInt32(maskedTextBoxParking.Text);
+				if (exterminator != null)
+				{
+					Bitmap bmp = new Bitmap(pictureBoxLittleParking.Width,
+				    pictureBoxLittleParking.Height);
 					Graphics gr = Graphics.FromImage(bmp);
-					parking[listBoxLevels.SelectedIndex].Draw(gr);
-					pictureBoxParking.Image = bmp;
+					exterminator.SetPosition(5, 5, pictureBoxLittleParking.Width,
+				    pictureBoxLittleParking.Height);
+					exterminator.DrawExterminator(gr);
+					pictureBoxLittleParking.Image = bmp;
 				}
-			}
-			private void buttonParkingSimpleplane_Click(object sender, EventArgs e)//простой самолет
-			{
-				if (listBoxLevels.SelectedIndex > -1)
+				else
 				{
-					ColorDialog dialog = new ColorDialog();
-					if (dialog.ShowDialog() == DialogResult.OK)
-					{
-						var exterminator = new Simpleplane(100, 1000, dialog.Color);
-						int place = parking[listBoxLevels.SelectedIndex] + exterminator;
-						if (place == -1)
-						{
-							MessageBox.Show("Нет свободных мест", "Ошибка",
-						   MessageBoxButtons.OK, MessageBoxIcon.Error);
-						}
-						Draw();
-					}
+					Bitmap bmp = new Bitmap(pictureBoxLittleParking.Width,
+				    pictureBoxLittleParking.Height);
+					pictureBoxLittleParking.Image = bmp;
 				}
+				Draw();
 			}
-			private void buttonParkingExterminator_Click(object sender, EventArgs e)//сложный самолет
-			{
-				if (listBoxLevels.SelectedIndex > -1)
-				{
-					ColorDialog dialog = new ColorDialog();
-					if (dialog.ShowDialog() == DialogResult.OK)
-					{
-						ColorDialog dialogDop = new ColorDialog();
-						if (dialogDop.ShowDialog() == DialogResult.OK)
-						{
-							var exterminator = new Exterminator(100, 1000, dialog.Color, dialogDop.Color, true, true, true);
-							int place = parking[listBoxLevels.SelectedIndex] + exterminator;
-							if (place == -1)
-							{
-								MessageBox.Show("Нет свободных мест", "Ошибка",
-							   MessageBoxButtons.OK, MessageBoxIcon.Error);
-							}
-							Draw();
-						}
-					}
-				}
-			}
-			private void buttonTakePlane_Click(object sender, EventArgs e)
-			{
-				if (listBoxLevels.SelectedIndex > -1)
-				{
-					if (maskedTextBoxParking.Text != "")
-					{
-						var exterminator = parking[listBoxLevels.SelectedIndex] - Convert.ToInt32(maskedTextBoxParking.Text);
-						if (exterminator != null)
-						{
-							Bitmap bmp = new Bitmap(pictureBoxLittleParking.Width, pictureBoxLittleParking.Height);
-							Graphics gr = Graphics.FromImage(bmp);
-							exterminator.SetPosition(5, 5, pictureBoxLittleParking.Width, pictureBoxLittleParking.Height);
-							exterminator.DrawExterminator(gr);
-							pictureBoxLittleParking.Image = bmp;
-						}
-						else
-						{
-							Bitmap bmp = new Bitmap(pictureBoxLittleParking.Width, pictureBoxLittleParking.Height);
-							pictureBoxLittleParking.Image = bmp;
-						}
-						Draw();
-					}
-				}
-			}
-	}	
+		}
+	}
 }

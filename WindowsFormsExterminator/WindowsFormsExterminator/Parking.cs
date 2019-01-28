@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace WindowsFormsExterminator
 {
 	/// <summary>
-	/// Параметризованны класс для хранения набора объектов от интерфейса ITransport
+	/// Параметризованны класс для хранения набора объектов от интерфейса IPlane
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	public class Parking<T> where T : class, IPlane
@@ -16,11 +16,7 @@ namespace WindowsFormsExterminator
 		/// <summary>
 		/// Массив объектов, которые храним
 		/// </summary>
-		private Dictionary<int, T> _places;
-		/// <summary>
-		/// Максимальное количество мест на парковке
-		/// </summary>
-		private int _maxCount;
+		private T[] _places;
 		/// <summary>
 		/// Ширина окна отрисовки
 		/// </summary>
@@ -45,29 +41,28 @@ namespace WindowsFormsExterminator
 		/// <param name="pictureHeight">Рамзер парковки - высота</param>
 		public Parking(int sizes, int pictureWidth, int pictureHeight)
 		{
-			_maxCount = sizes;
-			_places = new Dictionary<int, T>();
+			_places = new T[sizes];
 			PictureWidth = pictureWidth;
 			PictureHeight = pictureHeight;
+			for (int i = 0; i < _places.Length; i++)
+			{
+				_places[i] = null;
+			}
 		}
 		/// <summary>
 		/// Перегрузка оператора сложения
 		/// Логика действия: на парковку добавляется автомобиль
 		/// </summary>
 		/// <param name="p">Парковка</param>
-		/// <param name=" exterminator">Добавляемый автомобиль</param>
+		/// <param name="exterminator">Добавляемый автомобиль</param>
 		/// <returns></returns>
 		public static int operator +(Parking<T> p, T exterminator)
 		{
-			if (p._places.Count == p._maxCount)
-			{
-				return -1;
-			}
-			for (int i = 0; i < p._maxCount; i++)
+			for (int i = 0; i < p._places.Length; i++)
 			{
 				if (p.CheckFreePlace(i))
 				{
-					p._places.Add(i, exterminator);
+					p._places[i] = exterminator;
 					p._places[i].SetPosition(5 + i / 5 * p._placeSizeWidth + 5,
 					 i % 5 * p._placeSizeHeight + 15, p.PictureWidth,
 					p.PictureHeight);
@@ -85,10 +80,14 @@ namespace WindowsFormsExterminator
 		/// <returns></returns>
 		public static T operator -(Parking<T> p, int index)
 		{
+			if (index < 0 || index > p._places.Length)
+			{
+				return null;
+			}
 			if (!p.CheckFreePlace(index))
 			{
 				T exterminator = p._places[index];
-				p._places.Remove(index);
+				p._places[index] = null;
 				return exterminator;
 			}
 			return null;
@@ -100,7 +99,7 @@ namespace WindowsFormsExterminator
 		/// <returns></returns>
 		private bool CheckFreePlace(int index)
 		{
-			return !_places.ContainsKey(index);
+			return _places[index] == null;
 		}
 		/// <summary>
 		/// Метод отрисовки парковки
@@ -109,10 +108,12 @@ namespace WindowsFormsExterminator
 		public void Draw(Graphics g)
 		{
 			DrawMarking(g);
-			var keys = _places.Keys.ToList();
-			for (int i = 0; i < keys.Count; i++)
+			for (int i = 0; i < _places.Length; i++)
 			{
-				_places[keys[i]].DrawExterminator(g);
+				if (!CheckFreePlace(i))
+				{//если место не пустое
+					_places[i].DrawExterminator(g);
+				}
 			}
 		}
 		/// <summary>
@@ -122,9 +123,9 @@ namespace WindowsFormsExterminator
 		private void DrawMarking(Graphics g)
 		{
 			Pen pen = new Pen(Color.Black, 3);
-			//границы парковки
-			g.DrawRectangle(pen, 0, 0, (_maxCount / 5) * _placeSizeWidth, 480);
-			for (int i = 0; i < _maxCount / 5; i++)
+			//границы праковки
+			g.DrawRectangle(pen, 0, 0, (_places.Length / 5) * _placeSizeWidth, 480);
+			for (int i = 0; i < _places.Length / 5; i++)
 			{//отрисовываем, по 5 мест на линии
 				for (int j = 0; j < 6; ++j)
 				{//линия рамзетки места
