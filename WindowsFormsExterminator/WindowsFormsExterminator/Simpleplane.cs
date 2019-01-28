@@ -13,11 +13,11 @@ namespace WindowsFormsExterminator
 		/// <summary>
 		/// Ширина отрисовки автомобиля
 		/// </summary>
-		protected const int extermWidth = 180;
+		protected const int extermWidth = 110;
 		/// <summary>
 		/// Ширина отрисовки автомобиля
 		/// </summary>
-		protected const int extermHeight = 160;
+		protected const int extermHeight = 60;
 		/// <summary>
 		/// Конструктор
 		/// </summary>
@@ -68,31 +68,16 @@ namespace WindowsFormsExterminator
 		public override void DrawExterminator(Graphics g)
 		{
 			Pen pen = new Pen(Color.Black, 2);
-			//1
-			g.DrawLine(pen, _startPosX + 100, _startPosY + 110, _startPosX + 170, _startPosY + 120);
-			//2
-			g.DrawLine(pen, _startPosX + 100, _startPosY + 130, _startPosX + 170, _startPosY + 120);
-			//3
-			g.DrawLine(pen, _startPosX + 100, _startPosY + 110, _startPosX + 65, _startPosY + 80);
-			//4
-			g.DrawLine(pen, _startPosX + 100, _startPosY + 130, _startPosX + 65, _startPosY + 160);
-			//5
-			g.DrawLine(pen, _startPosX + 65, _startPosY + 80, _startPosX + 50, _startPosY + 95);
-			//6
-			g.DrawLine(pen, _startPosX + 65, _startPosY + 160, _startPosX + 50, _startPosY + 145);
-			//7
-			g.DrawLine(pen, _startPosX + 50, _startPosY + 95, _startPosX + 65, _startPosY + 110);
-			//8
-			g.DrawLine(pen, _startPosX + 50, _startPosY + 145, _startPosX + 65, _startPosY + 130);
-			//9
-			SolidBrush fillRect = new SolidBrush(Color.Blue);
-			g.DrawRectangle(pen, _startPosX + 40, _startPosY + 110, 25, 20);
-			g.FillRectangle(fillRect, _startPosX + 40, _startPosY + 110, 25, 20);
-			//10
-			g.DrawLine(pen, _startPosX + 40, _startPosY + 120, _startPosX + 25, _startPosY + 110);
-			//11
-			g.DrawLine(pen, _startPosX + 40, _startPosY + 120, _startPosX + 25, _startPosY + 130);
-
+			g.DrawLine(pen, _startPosX + 40, _startPosY + 15, _startPosX + 90, _startPosY + 25);
+			g.DrawLine(pen, _startPosX + 40, _startPosY + 35, _startPosX + 90, _startPosY + 25);
+			g.DrawLine(pen, _startPosX + 40, _startPosY + 15, _startPosX + 25, _startPosY);
+			g.DrawLine(pen, _startPosX + 40, _startPosY + 35, _startPosX + 25, _startPosY + 50);
+			g.DrawLine(pen, _startPosX + 25, _startPosY, _startPosX + 17, _startPosY + 8);
+			g.DrawLine(pen, _startPosX + 25, _startPosY + 50, _startPosX + 17, _startPosY + 42);
+			g.DrawLine(pen, _startPosX + 17, _startPosY + 8, _startPosX + 7, _startPosY + 25);
+			g.DrawLine(pen, _startPosX + 17, _startPosY + 42, _startPosX + 7, _startPosY + 25);
+			Brush br = new SolidBrush(MainColor);
+			g.FillEllipse(br, _startPosX + 15, _startPosY + 18, 15, 15);
 		}
 
 	}
